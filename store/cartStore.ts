@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Product } from "@/data/product";
 
+// --- Cart Store Definitions ---
+
 // Define what a "Cart Item" looks like (Product + Quantity)
 interface CartItem extends Product {
   quantity: number;
@@ -64,5 +66,41 @@ export const useCart = create<CartState>()(
       },
     }),
     { name: "eizy-mart-storage" }, // This saves the cart to LocalStorage automatically
+  ),
+);
+
+// --- Wishlist Store Definitions ---
+
+interface WishlistState {
+  wishlist: Product[];
+  addToWishlist: (product: Product) => void;
+  removeFromWishlist: (productId: string) => void;
+  isInWishlist: (productId: string) => boolean;
+  clearWishlist: () => void;
+}
+
+export const useWishlist = create<WishlistState>()(
+  persist(
+    (set, get) => ({
+      wishlist: [],
+
+      addToWishlist: (product) => {
+        // Only add if it's not already in the list
+        if (!get().isInWishlist(product.id)) {
+          set({ wishlist: [...get().wishlist, product] });
+        }
+      },
+
+      removeFromWishlist: (productId) =>
+        set({
+          wishlist: get().wishlist.filter((item) => item.id !== productId),
+        }),
+
+      isInWishlist: (productId) =>
+        get().wishlist.some((item) => item.id === productId),
+
+      clearWishlist: () => set({ wishlist: [] }),
+    }),
+    { name: "eizy-mart-wishlist-storage" }, // This saves the wishlist to LocalStorage
   ),
 );
