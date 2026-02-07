@@ -41,7 +41,7 @@ export default function PopularProducts() {
           >
             {/* Image Container */}
             <Link
-              href={`/product/${product.slug}`}
+              href={`/products/${product.slug}`}
               className="relative aspect-square w-full bg-gray-100 overflow-hidden"
             >
               <Image
