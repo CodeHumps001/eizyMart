@@ -6,6 +6,10 @@ import { ArrowRight } from "lucide-react"; // Optional icon for flair
 import Link from "next/link";
 import ShopByCat from "@/components/shop-cart-component";
 import HeroProductDisplay from "@/components/hero-product";
+import PopularProducts from "@/components/popular-product";
+import WhyShopWithUs from "@/components/why-shop";
+import PromoBanner from "@/components/Promo-banner";
+import Newsletter from "@/components/news-letter";
 
 const categories = [
   {
@@ -31,6 +35,10 @@ export default function Homepage() {
       <HeroProductDisplay />
 
       <ShopByCat />
+      <PopularProducts />
+      <WhyShopWithUs />
+      <PromoBanner />
+      <Newsletter />
     </main>
   );
 }
