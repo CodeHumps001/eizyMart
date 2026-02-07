@@ -1,13 +1,21 @@
 "use client";
+import { useCart } from "@/store/cartStore";
 import { Menu, X, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import CartModal from "./cart-modal";
+// Assuming you created CartModal.tsx in a 'components' folder
 
 export default function HeaderComponent() {
   const [showMenu, setShowMenu] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false); // State to control modal visibility
+
+  // Calculate total items for the badge
+  const totalItems = useCart((state) =>
+    state.cart.reduce((sum, item) => sum + item.quantity, 0),
+  );
 
   return (
-    // 1. We use a relative wrapper, but the header itself is 'fixed'
     <div className="relative h-20">
       <header className="fixed z-[100] top-4 left-1/2 -translate-x-1/2 w-11/12 md:w-9/12 p-4 flex justify-between items-center rounded-2xl bg-white/70 backdrop-blur-xl border border-white/20 shadow-lg transition-all duration-300">
         <Link href="/">
@@ -15,7 +23,6 @@ export default function HeaderComponent() {
             <span className="p-2 bg-gradient-to-tr from-orange-400 to-orange-700 rounded-xl text-white font-semibold text-xs md:text-sm">
               eizy
             </span>
-            {/* Changed text color to gray-900 so it's readable on the light sticky bg */}
             <h1 className="text-xl md:text-2xl font-bold text-gray-900">
               Mart
             </h1>
@@ -23,7 +30,6 @@ export default function HeaderComponent() {
         </Link>
 
         <div className="flex justify-center items-center gap-4 md:gap-6">
-          {/* Desktop Nav */}
           <Link
             href="/products"
             className="hidden md:block text-gray-600 font-medium hover:text-orange-600 transition-colors"
@@ -31,12 +37,20 @@ export default function HeaderComponent() {
             Products
           </Link>
 
-          <div className="relative cursor-pointer group">
+          {/* Shopping Cart Button - Opens the modal */}
+          <button
+            onClick={() => setIsCartOpen(true)} // Added onClick handler
+            className="relative cursor-pointer group hover:scale-110 transition-transform"
+            aria-label="Open cart"
+          >
             <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-orange-600 transition-colors" />
-            <span className="absolute -top-2 -right-2 bg-orange-600 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full animate-pulse">
-              0
-            </span>
-          </div>
+            {/* Show badge only if items are in the cart */}
+            {totalItems > 0 && (
+              <span className="absolute -top-2 -right-2 bg-orange-600 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full animate-pulse">
+                {totalItems}
+              </span>
+            )}
+          </button>
 
           <User className="w-6 h-6 text-gray-700 cursor-pointer hover:text-orange-600 transition-colors hidden sm:block" />
 
@@ -46,7 +60,7 @@ export default function HeaderComponent() {
             </button>
           </Link>
 
-          {/* Mobile Toggle */}
+          {/* Mobile Toggle Button */}
           <button
             aria-label="Toggle menu"
             className="md:hidden text-gray-800 p-1 hover:bg-gray-100 rounded-lg transition-colors"
@@ -56,7 +70,8 @@ export default function HeaderComponent() {
           </button>
         </div>
 
-        {/* 2. MOBILE MENU: Now nested inside fixed header so it stays with it */}
+        {/* Mobile Menu */}
+        {/* ... (mobile menu JSX remains the same) ... */}
         <div
           className={`
             absolute top-[calc(100%+10px)] left-0 w-full
@@ -80,6 +95,11 @@ export default function HeaderComponent() {
           </Link>
         </div>
       </header>
+
+      {/* RENDER THE CART MODAL HERE */}
+      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   );
 }
+
+// NOTE: Ensure you have created the file components/CartModal.tsx with the code provided in the previous response.
