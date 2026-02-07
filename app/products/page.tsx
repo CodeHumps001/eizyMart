@@ -12,7 +12,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { products, Product } from "@/data/product";
-import { useWishlist } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 const allCategories = [
   "All",
@@ -21,16 +21,13 @@ const allCategories = [
 
 // 2. Updated ProductCard component with Wishlist functionality
 const ProductCard = ({ product }: { product: Product }) => {
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
   const isSaved = isInWishlist(product.id);
 
-  const toggleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigating when the heart is clicked
-    if (isSaved) {
-      removeFromWishlist(product.id);
-    } else {
-      addToWishlist(product);
-    }
+  const handleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(product.id);
   };
 
   return (
@@ -39,10 +36,10 @@ const ProductCard = ({ product }: { product: Product }) => {
         href={`/products/${product.slug}`}
         className="relative aspect-square w-full bg-gray-100 overflow-hidden"
       >
-        {/* Wishlist Button Overlay */}
+        {/* Wishlist Button */}
         <button
-          onClick={toggleWishlist}
-          className={`absolute top-3 right-3 p-2 rounded-full shadow-lg z-10 transition-colors ${
+          onClick={handleWishlist}
+          className={`absolute top-3 right-3 p-2 rounded-full shadow-lg z-10 transition-all ${
             isSaved
               ? "bg-red-500 text-white hover:bg-red-600"
               : "bg-white text-gray-400 opacity-0 group-hover:opacity-100 hover:text-red-500"
@@ -59,25 +56,30 @@ const ProductCard = ({ product }: { product: Product }) => {
           className="object-cover transition-transform duration-700 group-hover:scale-110"
           sizes="(max-width: 768px) 50vw, 25vw"
         />
+
         <button className="absolute bottom-3 right-3 bg-black text-white p-2.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-orange-600">
           <ShoppingCart size={18} />
         </button>
+
         {product.isNew && (
           <span className="absolute top-2 left-2 bg-orange-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
             New
           </span>
         )}
       </Link>
+
       <div className="p-4 space-y-2">
         <Link href={`/products/${product.slug}`}>
           <h3 className="font-bold text-gray-900 group-hover:text-orange-600 transition-colors truncate text-sm md:text-base">
             {product.name}
           </h3>
         </Link>
+
         <div className="flex items-center justify-between">
           <span className="text-xl font-black text-gray-900">
             ${product.price}
           </span>
+
           <div className="flex items-center text-orange-500 gap-1">
             <Star size={12} fill="currentColor" />
             <span className="text-xs font-bold text-gray-900">
