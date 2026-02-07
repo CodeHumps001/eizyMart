@@ -2,31 +2,42 @@
 import { products } from "@/data/product";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { Star, ShoppingBag, ArrowLeft, RefreshCw, Truck } from "lucide-react";
+import {
+  Star,
+  ShoppingBag,
+  ArrowLeft,
+  RefreshCw,
+  Truck,
+  Check,
+} from "lucide-react"; // Added Check icon
 import Link from "next/link";
 import { useCart } from "@/store/cartStore";
 import PopularProducts from "@/components/popular-product";
 
 export default function ProductPage() {
   const { slug } = useParams();
-  const addToCart = useCart((state) => state.addToCart);
+
+  // 1. Get both the cart and the addToCart function
+  const { cart, addToCart } = useCart();
 
   const product = products.find((p) => p.slug === slug);
 
   if (!product)
     return <div className="p-20 text-center">Product not found.</div>;
 
+  // 2. Check if this specific product is already in the cart
+  // We use String() to ensure ID comparison is safe
+  const isInCart = cart.some((item) => String(item.id) === String(product.id));
+
   return (
     <main className="max-w-7xl mx-auto px-6 md:px-8 py-10 md:py-20">
-      {/* Back Link */}
       <Link
-        href="/products" // Link back to the main products list
+        href="/products"
         className="flex items-center gap-2 text-gray-500 hover:text-orange-600 mb-10 transition-colors font-medium text-sm"
       >
         <ArrowLeft size={18} /> Back to Shop
       </Link>
 
-      {/* Main Product Layout */}
       <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-start">
         {/* Left: Product Image & Details */}
         <div className="flex flex-col gap-8">
@@ -35,12 +46,10 @@ export default function ProductPage() {
               src={product.image}
               alt={product.name}
               fill
-              // Removed heavy padding, keeping it subtle
               className="object-contain p-6 md:p-10"
             />
           </div>
 
-          {/* Added a subtle trust builder section */}
           <div className="flex justify-around bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
             <div className="flex items-center gap-3">
               <Truck className="w-5 h-5 text-orange-600" />
@@ -59,18 +68,13 @@ export default function ProductPage() {
 
         {/* Right: Product Details & CTA */}
         <div className="space-y-8 sticky top-20">
-          {" "}
-          {/* Sticky ensures details follow scroll */}
-          {/* Title and Rating */}
           <div className="space-y-4">
             <span className="text-gray-400 font-bold tracking-[0.2em] uppercase text-xs">
               {product.category}
             </span>
-
             <h1 className="text-4xl md:text-5xl font-black uppercase text-gray-900 leading-tight">
               {product.name}
             </h1>
-
             <div className="flex items-center gap-4">
               <div className="flex items-center text-orange-500 gap-1 bg-orange-50 px-3 py-1 rounded-full">
                 <Star size={16} fill="currentColor" />
@@ -79,15 +83,15 @@ export default function ProductPage() {
                 </span>
               </div>
               <span className="text-gray-400 text-sm">
-                {product.reviewsCount} Customer Reviews
+                {product.reviewsCount} Reviews
               </span>
             </div>
           </div>
-          {/* Description */}
+
           <p className="text-gray-600 text-base md:text-lg leading-relaxed max-w-lg">
             {product.description}
           </p>
-          {/* Pricing and Stock */}
+
           <div className="space-y-3">
             <p className="text-4xl font-black text-gray-900">
               ${product.price}
@@ -105,17 +109,38 @@ export default function ProductPage() {
                 : "Out of Stock"}
             </p>
           </div>
-          {/* CTA Button */}
+
+          {/* 3. Logic-Driven Button */}
           <button
+            disabled={isInCart || product.stock === 0}
             onClick={() => addToCart(product)}
-            className="w-full bg-zinc-900 hover:bg-orange-600 text-white px-12 py-4 rounded-xl font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl active:scale-95 text-sm"
+            className={`
+              w-full px-12 py-4 rounded-xl font-bold uppercase tracking-widest transition-all 
+              flex items-center justify-center gap-3 shadow-xl text-sm
+              ${
+                isInCart
+                  ? "bg-green-600 text-white cursor-default"
+                  : "bg-zinc-900 hover:bg-orange-600 text-white active:scale-95"
+              }
+              ${product.stock === 0 ? "bg-gray-400 cursor-not-allowed" : ""}
+            `}
           >
-            Add to Cart
-            <ShoppingBag size={20} />
+            {isInCart ? (
+              <>
+                Added to Cart
+                <Check size={20} />
+              </>
+            ) : product.stock === 0 ? (
+              "Out of Stock"
+            ) : (
+              <>
+                Add to Cart
+                <ShoppingBag size={20} />
+              </>
+            )}
           </button>
         </div>
       </div>
-      {/* Add Related Products section here later */}
       <PopularProducts />
     </main>
   );

@@ -1,19 +1,20 @@
 "use client";
 import { useCart } from "@/store/cartStore";
-import { Menu, X, ShoppingCart, User } from "lucide-react";
+import { useWishlistStore } from "@/store/wishlistStore"; // Import wishlist store
+import { Menu, X, ShoppingCart, User, Heart } from "lucide-react"; // Added Heart icon
 import Link from "next/link";
 import { useState } from "react";
 import CartModal from "./cart-modal";
-// Assuming you created CartModal.tsx in a 'components' folder
 
 export default function HeaderComponent() {
   const [showMenu, setShowMenu] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false); // State to control modal visibility
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Calculate total items for the badge
+  // 1. Get totals for badges
   const totalItems = useCart((state) =>
     state.cart.reduce((sum, item) => sum + item.quantity, 0),
   );
+  const wishlistCount = useWishlistStore((state) => state.wishlist.length);
 
   return (
     <div className="relative h-20">
@@ -37,14 +38,27 @@ export default function HeaderComponent() {
             Products
           </Link>
 
-          {/* Shopping Cart Button - Opens the modal */}
+          {/* 2. Wishlist Button - Navigates to /wishlist */}
+          <Link
+            href="/wishlist"
+            className="relative cursor-pointer group hover:scale-110 transition-transform"
+            aria-label="View wishlist"
+          >
+            <Heart className="w-6 h-6 text-gray-700 group-hover:text-red-500 transition-colors" />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Shopping Cart Button */}
           <button
-            onClick={() => setIsCartOpen(true)} // Added onClick handler
+            onClick={() => setIsCartOpen(true)}
             className="relative cursor-pointer group hover:scale-110 transition-transform"
             aria-label="Open cart"
           >
             <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-orange-600 transition-colors" />
-            {/* Show badge only if items are in the cart */}
             {totalItems > 0 && (
               <span className="absolute -top-2 -right-2 bg-orange-600 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full animate-pulse">
                 {totalItems}
@@ -71,7 +85,6 @@ export default function HeaderComponent() {
         </div>
 
         {/* Mobile Menu */}
-        {/* ... (mobile menu JSX remains the same) ... */}
         <div
           className={`
             absolute top-[calc(100%+10px)] left-0 w-full
@@ -88,6 +101,14 @@ export default function HeaderComponent() {
           >
             All Products
           </Link>
+          {/* Added Wishlist to Mobile Menu */}
+          <Link
+            href="/wishlist"
+            onClick={() => setShowMenu(false)}
+            className="text-gray-700 font-semibold hover:text-red-500 py-2 border-b border-gray-50"
+          >
+            My Wishlist ({wishlistCount})
+          </Link>
           <Link href="/shop" onClick={() => setShowMenu(false)}>
             <button className="w-full py-3 bg-orange-600 text-white rounded-xl font-bold shadow-orange-200 shadow-lg">
               Shop Now
@@ -96,10 +117,7 @@ export default function HeaderComponent() {
         </div>
       </header>
 
-      {/* RENDER THE CART MODAL HERE */}
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   );
 }
-
-// NOTE: Ensure you have created the file components/CartModal.tsx with the code provided in the previous response.
