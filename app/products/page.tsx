@@ -36,14 +36,16 @@ const ProductCard = ({ product }: { product: Product }) => {
         href={`/products/${product.slug}`}
         className="relative aspect-square w-full bg-gray-100 overflow-hidden"
       >
-        {/* Wishlist Button */}
+        {/* Wishlist Button: Always visible on mobile, hover-only on desktop unless saved */}
         <button
           onClick={handleWishlist}
-          className={`absolute top-3 right-3 p-2 rounded-full shadow-lg z-10 transition-all ${
-            isSaved
-              ? "bg-red-500 text-white hover:bg-red-600"
-              : "bg-white text-gray-400 opacity-0 group-hover:opacity-100 hover:text-red-500"
-          }`}
+          className={`absolute top-3 right-3 p-2.5 rounded-full shadow-lg z-10 transition-all duration-300 
+            ${
+              isSaved
+                ? "bg-red-500 text-white translate-y-0 opacity-100"
+                : "bg-white text-gray-400 md:opacity-0 md:group-hover:opacity-100 md:translate-y-[-10px] md:group-hover:translate-y-0 hover:text-red-500"
+            }
+          `}
           aria-label="Toggle wishlist"
         >
           <Heart size={18} className={isSaved ? "fill-current" : ""} />
@@ -53,16 +55,17 @@ const ProductCard = ({ product }: { product: Product }) => {
           src={product.image}
           alt={product.name}
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-110"
+          className="object-contain p-4 transition-transform duration-700 group-hover:scale-110"
           sizes="(max-width: 768px) 50vw, 25vw"
         />
 
-        <button className="absolute bottom-3 right-3 bg-black text-white p-2.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-orange-600">
+        {/* Shopping Cart Button: Always visible on mobile, hover-only on desktop */}
+        <button className="absolute bottom-3 right-3 bg-black text-white p-2.5 rounded-full shadow-lg z-10 transition-all duration-300 md:opacity-0 md:group-hover:opacity-100 md:translate-y-[10px] md:group-hover:translate-y-0 hover:bg-orange-600">
           <ShoppingCart size={18} />
         </button>
 
         {product.isNew && (
-          <span className="absolute top-2 left-2 bg-orange-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+          <span className="absolute top-3 left-3 bg-orange-600 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
             New
           </span>
         )}
