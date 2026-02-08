@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import Cookies from "js-cookie"; // Import js-cookie
+import Cookies from "js-cookie";
 
 interface UserState {
   user: { name: string; email: string } | null;
@@ -13,21 +13,21 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       user: null,
 
-      /* ---- SET LOGIN (Store + Cookie) ---- */
+      /* ---- SET LOGIN ---- */
       setLogin: (name, email) => {
-        // 1. Set the cookie so Middleware can protect routes on the server
-        Cookies.set("eizy_auth", "true", { expires: 7 });
+        // ADD { path: "/" } HERE
+        // This makes the cookie available to the Middleware on /products and /checkout
+        Cookies.set("eizy_auth", "true", { expires: 7, path: "/" });
 
-        // 2. Update local state
         set({ user: { name, email } });
       },
 
-      /* ---- LOGOUT (Clear Store + Remove Cookie) ---- */
+      /* ---- LOGOUT ---- */
       logout: () => {
-        // 1. Remove the cookie to unlock the Middleware gate
-        Cookies.remove("eizy_auth");
+        // ADD { path: "/" } HERE TOO
+        // You must use the same path to remove it as you did to set it
+        Cookies.remove("eizy_auth", { path: "/" });
 
-        // 2. Clear local state
         set({ user: null });
       },
     }),
