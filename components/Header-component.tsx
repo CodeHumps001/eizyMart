@@ -1,7 +1,8 @@
 "use client";
 import { useCart } from "@/store/cartStore";
-import { useWishlistStore } from "@/store/wishlistStore"; // Import wishlist store
-import { Menu, X, ShoppingCart, User, Heart } from "lucide-react"; // Added Heart icon
+import { useWishlistStore } from "@/store/wishlistStore";
+import { useUserStore } from "@/store/userStore"; // Import the user store
+import { Menu, X, ShoppingCart, User, Heart, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import CartModal from "./cart-modal";
@@ -10,11 +11,12 @@ export default function HeaderComponent() {
   const [showMenu, setShowMenu] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // 1. Get totals for badges
+  // 1. Hook into all stores
   const totalItems = useCart((state) =>
     state.cart.reduce((sum, item) => sum + item.quantity, 0),
   );
   const wishlistCount = useWishlistStore((state) => state.wishlist.length);
+  const { user, logout } = useUserStore(); // Get user state
 
   return (
     <div className="relative h-20">
@@ -38,11 +40,9 @@ export default function HeaderComponent() {
             Products
           </Link>
 
-          {/* 2. Wishlist Button - Navigates to /wishlist */}
           <Link
             href="/wishlist"
             className="relative cursor-pointer group hover:scale-110 transition-transform"
-            aria-label="View wishlist"
           >
             <Heart className="w-6 h-6 text-gray-700 group-hover:text-red-500 transition-colors" />
             {wishlistCount > 0 && (
@@ -52,11 +52,9 @@ export default function HeaderComponent() {
             )}
           </Link>
 
-          {/* Shopping Cart Button */}
           <button
             onClick={() => setIsCartOpen(true)}
             className="relative cursor-pointer group hover:scale-110 transition-transform"
-            aria-label="Open cart"
           >
             <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-orange-600 transition-colors" />
             {totalItems > 0 && (
@@ -66,17 +64,33 @@ export default function HeaderComponent() {
             )}
           </button>
 
-          <User className="w-6 h-6 text-gray-700 cursor-pointer hover:text-orange-600 transition-colors hidden sm:block" />
+          {/* 2. AUTHENTICATION UI LOGIC */}
+          {user ? (
+            <div className="hidden sm:flex items-center gap-3 bg-gray-100/50 pl-3 pr-1 py-1 rounded-full border border-gray-200">
+              <span className="text-[10px] font-black uppercase tracking-tight text-gray-900">
+                Hi, {user.name.split(" ")[0]}
+              </span>
+              <button
+                onClick={logout}
+                className="p-1.5 bg-white rounded-full text-gray-400 hover:text-red-500 shadow-sm transition-colors"
+                title="Logout"
+              >
+                <LogOut size={14} />
+              </button>
+            </div>
+          ) : (
+            <Link href="/auth/login">
+              <User className="w-6 h-6 text-gray-700 cursor-pointer hover:text-orange-600 transition-colors hidden sm:block" />
+            </Link>
+          )}
 
-          <Link href="/shop" className="hidden md:block">
+          <Link href="/products" className="hidden md:block">
             <button className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 transition-all rounded-xl text-white font-semibold text-sm shadow-md active:scale-95">
               Shop now
             </button>
           </Link>
 
-          {/* Mobile Toggle Button */}
           <button
-            aria-label="Toggle menu"
             className="md:hidden text-gray-800 p-1 hover:bg-gray-100 rounded-lg transition-colors"
             onClick={() => setShowMenu(!showMenu)}
           >
@@ -86,13 +100,7 @@ export default function HeaderComponent() {
 
         {/* Mobile Menu */}
         <div
-          className={`
-            absolute top-[calc(100%+10px)] left-0 w-full
-            bg-white/95 backdrop-blur-lg shadow-xl rounded-2xl p-6 flex flex-col gap-4 md:hidden
-            border border-gray-100 origin-top
-            transform transition-all duration-300 ease-out
-            ${showMenu ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}
-          `}
+          className={`absolute top-[calc(100%+10px)] left-0 w-full bg-white/95 backdrop-blur-lg shadow-xl rounded-2xl p-6 flex flex-col gap-4 md:hidden border border-gray-100 origin-top transform transition-all duration-300 ease-out ${showMenu ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
         >
           <Link
             href="/products"
@@ -101,7 +109,6 @@ export default function HeaderComponent() {
           >
             All Products
           </Link>
-          {/* Added Wishlist to Mobile Menu */}
           <Link
             href="/wishlist"
             onClick={() => setShowMenu(false)}
@@ -109,6 +116,28 @@ export default function HeaderComponent() {
           >
             My Wishlist ({wishlistCount})
           </Link>
+
+          {/* Mobile Auth Link */}
+          {user ? (
+            <button
+              onClick={() => {
+                logout();
+                setShowMenu(false);
+              }}
+              className="text-left text-red-500 font-semibold py-2 border-b border-gray-50"
+            >
+              Logout ({user.name})
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setShowMenu(false)}
+              className="text-gray-700 font-semibold hover:text-orange-600 py-2 border-b border-gray-50"
+            >
+              Login / Register
+            </Link>
+          )}
+
           <Link href="/shop" onClick={() => setShowMenu(false)}>
             <button className="w-full py-3 bg-orange-600 text-white rounded-xl font-bold shadow-orange-200 shadow-lg">
               Shop Now
