@@ -65,12 +65,12 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/headphones" className="hover:text-orange-500">
+                  <Link href="/products" className="hover:text-orange-500">
                     Headphones
                   </Link>
                 </li>
                 <li>
-                  <Link href="/watches" className="hover:text-orange-500">
+                  <Link href="/products" className="hover:text-orange-500">
                     Watches
                   </Link>
                 </li>
@@ -82,16 +82,6 @@ export default function Footer() {
                 Support
               </h4>
               <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="#" className="hover:text-orange-500">
-                    Shipping
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-orange-500">
-                    Returns
-                  </Link>
-                </li>
                 <li>
                   <Link href="#" className="hover:text-orange-500">
                     FAQ
@@ -119,10 +109,10 @@ export default function Footer() {
         <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold">
           <p>© {currentYear} EIZY MART. ALL RIGHTS RESERVED.</p>
           <div className="flex gap-6">
-            <Link href="#" className="hover:text-white">
+            <Link href="/privacy" className="hover:text-white">
               Privacy Policy
             </Link>
-            <Link href="#" className="hover:text-white">
+            <Link href="/terms" className="hover:text-white">
               Terms of Service
             </Link>
           </div>
