@@ -83,7 +83,7 @@ export default function Footer() {
               </h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="#" className="hover:text-orange-500">
+                  <Link href="faq" className="hover:text-orange-500">
                     FAQ
                   </Link>
                 </li>
